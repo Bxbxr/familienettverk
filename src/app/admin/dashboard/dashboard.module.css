@@ -1,0 +1,80 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.primaryButton {
+  background-color: #1e60a9; /* brand-blue */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+.primaryButton:hover {
+  background-color: #174a86;
+}
+
+.tableContainer {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  overflow-x: auto; /* For responsiveness on small screens */
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th,
+.table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table th {
+  background-color: #f9fafb;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.table td {
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.editButton,
+.deleteButton {
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.editButton {
+  color: #1e60a9; /* brand-blue */
+}
+
+.deleteButton {
+  color: #d9363e; /* brand-red */
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+}

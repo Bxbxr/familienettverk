@@ -1,0 +1,35 @@
+/* A simple CSS reset */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+/* Set the default font for the entire site to Lato */
+html,
+body {
+  font-family: var(--font-lato), sans-serif;
+}
+
+body {
+  padding-top: 80px; /* This pushes all content down by 80px */
+}
+/* Set the font for all headings to Poppins */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-poppins), sans-serif;
+}

@@ -1,0 +1,15 @@
+{
+  "Navbar": {
+    "home": "Home",
+    "activities": "Activities",
+    "gallery": "Gallery",
+    "about": "About Us",
+    "volunteers": "Volunteers",
+    "contact": "Contact Us"
+  },
+  "Hero": {
+    "title": "Welcome to Familienettverk",
+    "subtitle": "Building community, one activity at a time. Join us to connect, learn, and grow together.",
+    "button": "See Our Activities"
+  }
+}

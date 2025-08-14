@@ -1,0 +1,15 @@
+{
+  "Navbar": {
+    "home": "Hjem",
+    "activities": "Aktiviteter",
+    "gallery": "Galleri",
+    "about": "Om Oss",
+    "volunteers": "Frivillige",
+    "contact": "Kontakt Oss"
+  },
+  "Hero": {
+    "title": "Velkommen til Familienettverk",
+    "subtitle": "Bygger fellesskap, én aktivitet om gangen. Bli med oss for å koble til, lære og vokse sammen.",
+    "button": "Se Våre Aktiviteter"
+  }
+}

@@ -1,0 +1,117 @@
+.sliderContainer {
+  width: 100%;
+  height: 50vh; /* 85% of the viewport height, you can change this */
+  position: relative;
+}
+
+/* Style the navigation buttons */
+.sliderContainer :global(.swiper-button-next),
+.sliderContainer :global(.swiper-button-prev) {
+  color: #ffffff; /* White arrows */
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  transition: background-color 0.2s ease;
+}
+.sliderContainer :global(.swiper-button-next:hover),
+.sliderContainer :global(.swiper-button-prev:hover) {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.sliderContainer :global(.swiper-button-next::after),
+.sliderContainer :global(.swiper-button-prev::after) {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Style the pagination dots */
+.sliderContainer :global(.swiper-pagination-bullet) {
+  background-color: #ffffff;
+  opacity: 0.7;
+}
+
+.sliderContainer :global(.swiper-pagination-bullet-active) {
+  background-color: #d9363e; /* Our brand-red for the active dot */
+  opacity: 1;
+}
+/* === ADD THESE NEW STYLES === */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* Dark overlay, 40% opacity */
+  z-index: 1; /* Make sure it's on top of the images */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+}
+
+.heroContent {
+  padding: 2rem;
+}
+
+.heroTitle {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.heroSubtitle {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  max-width: 600px;
+}
+
+.heroButton {
+  background-color: #d9363e; /* Our brand-red */
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background-color 0.2s ease, transform 0.2s ease; /* Add transform */
+  text-decoration: none;
+  display: inline-block;
+}
+
+.heroButton:hover {
+  background-color: #b52b32; /* A darker red for hover */
+  transform: translateY(-2px) scale(1.05); /* Lift and slightly enlarge */
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+}
+/* === ADD THIS NEW CODE FOR THE ZOOM ANIMATION === */
+
+/* 1. Define the animation keyframes */
+@keyframes kenburns-zoom {
+  0% {
+    transform: scale(1); /* Start at normal size */
+  }
+  100% {
+    transform: scale(1.1); /* End zoomed in by 10% */
+  }
+}
+
+/* 2. Apply the animation to the image inside the ACTIVE slide */
+.sliderContainer :global(.swiper-slide-active) img {
+  animation-name: kenburns-zoom;
+  animation-duration: 7.5s; /* How long the zoom takes */
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards; /* Keep the state at the end */
+}
+/* Media query for screens smaller than 768px (tablets and phones) */
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 2.2rem; /* Make the title smaller on mobile */
+  }
+  .heroSubtitle {
+    font-size: 1rem; /* Make the subtitle smaller */
+  }
+  .heroButton {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}
