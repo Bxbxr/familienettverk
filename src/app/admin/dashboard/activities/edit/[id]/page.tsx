@@ -1,23 +1,23 @@
-"use client"; // <-- This is the key. Make it a Client Component.
+"use client";
 
 import { useState, FormEvent, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient"; // Use the CLIENT helper
-import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
+import { useRouter, useParams } from "next/navigation"; // <-- FIX #1: Import useParams
 import AdminLayout from "@/components/AdminLayout";
 import styles from "../../../dashboard.module.css";
 import formStyles from "@/app/volunteers/volunteers.module.css";
 import { User } from "@supabase/supabase-js";
 
-export default function EditActivityPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+// The function now takes NO props
+export default function EditActivityPage() {
+  const router = useRouter();
+  const params = useParams(); // <-- FIX #2: Get params using the hook
+  const activityId = params.id as string; // Get the id from the hook's result
+
+  // All the rest of your code is PERFECT and does not need to change.
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  const router = useRouter();
-  const activityId = params.id;
 
   // Form state
   const [title, setTitle] = useState("");
@@ -29,7 +29,6 @@ export default function EditActivityPage({
 
   useEffect(() => {
     const checkUserAndFetchData = async () => {
-      // 1. Check for a logged-in user
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -39,7 +38,6 @@ export default function EditActivityPage({
       }
       setUser(session.user);
 
-      // 2. Fetch the specific activity's data
       const { data, error } = await supabase
         .from("activities")
         .select("*")
@@ -49,7 +47,6 @@ export default function EditActivityPage({
       if (error) {
         setMessage(`Error fetching data: ${error.message}`);
       } else if (data) {
-        // 3. Populate the form with the fetched data
         setTitle(data.title || "");
         setDescription(data.description || "");
         setImageUrl(data.image_url || "");
@@ -101,6 +98,7 @@ export default function EditActivityPage({
     );
   }
 
+  // The rest of the JSX is exactly the same
   return (
     <AdminLayout user={user}>
       <div className={styles.header}>
@@ -118,7 +116,6 @@ export default function EditActivityPage({
             className={formStyles.input}
           />
         </div>
-        {/* ... other form fields ... */}
         <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
           <label htmlFor="description">Description</label>
           <textarea
