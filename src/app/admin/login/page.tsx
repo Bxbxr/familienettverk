@@ -27,8 +27,12 @@ export default function LoginPage() {
 
       // If login is successful, redirect to the admin dashboard
       router.push("/admin/dashboard");
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unknown error occurred.");
+      }
     }
   };
 

@@ -13,12 +13,7 @@ export default function LocaleLayout({
 }) {
   return (
     <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
-      <body className={inter.className}>
-        <TranslationsProvider initialLocale={locale}>
-          <Navbar />
-          {children}
-        </TranslationsProvider>
-      </body>
+      <body className={inter.className}></body>
     </html>
   );
 }

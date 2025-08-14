@@ -103,7 +103,9 @@ export default function ContactPage() {
         const data = await response.json();
         if (Object.hasOwn(data, "errors")) {
           setStatus(
-            data["errors"].map((error: any) => error["message"]).join(", ")
+            data["errors"]
+              .map((error: { message: string }) => error["message"])
+              .join(", ")
           );
         } else {
           setStatus("Oops! There was a problem submitting your form.");
@@ -119,7 +121,7 @@ export default function ContactPage() {
       <header className={styles.header}>
         <h1 className={styles.title}>Contact Us</h1>
         <p className={styles.subtitle}>
-          We're here to help and answer any question you might have.
+          We&apos;re here to help and answer any question you might have.
         </p>
       </header>
 

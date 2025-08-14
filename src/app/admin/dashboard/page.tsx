@@ -37,8 +37,8 @@ export default function DashboardPage() {
 
   return (
     <AdminLayout user={user}>
-      <h1>Welcome to your Dashboard, {user.email}!</h1>
-      <p>This is the central place to manage your website's content.</p>
+      <h1>Welcome to your. Dashboard, {user.email}!</h1>
+      <p>This is the central place to manage your website s content.</p>
       <p>Select an option from the sidebar to get started.</p>
     </AdminLayout>
   );

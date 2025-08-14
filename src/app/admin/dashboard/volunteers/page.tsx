@@ -68,7 +68,7 @@ export default function ViewVolunteersPage() {
         <p>Error fetching volunteers.</p>
         <p>
           Please ensure you have created a SELECT policy for authenticated users
-          on the 'volunteers' table.
+          on the &apos;volunteers&apos; table.
         </p>
         <p>
           <strong>Error details:</strong> {error.message}
