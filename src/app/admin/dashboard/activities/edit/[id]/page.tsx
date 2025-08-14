@@ -1,18 +1,25 @@
-"use client";
+"use client"; // <-- This is the key. Make it a Client Component.
 
 import { useState, FormEvent, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient"; // Use the CLIENT helper
 import { useRouter } from "next/navigation";
 import AdminLayout from "@/components/AdminLayout";
-import styles from "../../../dashboard.module.css"; // Adjust path for shared CSS
-import formStyles from "@/app/volunteers/volunteers.module.css"; // Reuse form styles
+import styles from "../../../dashboard.module.css";
+import formStyles from "@/app/volunteers/volunteers.module.css";
+import { User } from "@supabase/supabase-js";
 
-// This component receives 'params' which contains the dynamic [id] from the URL
 export default function EditActivityPage({
   params,
 }: {
   params: { id: string };
 }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+  const router = useRouter();
+  const activityId = params.id;
+
+  // Form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [activityDate, setActivityDate] = useState("");
@@ -20,37 +27,36 @@ export default function EditActivityPage({
   const [imageUrl, setImageUrl] = useState("");
   const [registrationLink, setRegistrationLink] = useState("");
 
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
-  const router = useRouter();
-  const activityId = params.id;
-
-  // 1. Fetch the existing activity data when the page loads
   useEffect(() => {
-    const fetchActivityData = async () => {
-      if (!activityId) return;
+    const checkUserAndFetchData = async () => {
+      // 1. Check for a logged-in user
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/admin/login");
+        return;
+      }
+      setUser(session.user);
 
-      setLoading(true);
+      // 2. Fetch the specific activity's data
       const { data, error } = await supabase
         .from("activities")
         .select("*")
         .eq("id", activityId)
-        .single(); // .single() gets one record, or returns an error if not found
+        .single();
 
       if (error) {
-        setMessage(`Error fetching activity: ${error.message}`);
+        setMessage(`Error fetching data: ${error.message}`);
       } else if (data) {
-        // Populate the form fields with the fetched data
-        setTitle(data.title);
+        // 3. Populate the form with the fetched data
+        setTitle(data.title || "");
         setDescription(data.description || "");
         setImageUrl(data.image_url || "");
         setRegistrationLink(data.registration_link || "");
-
-        // Format dates for the datetime-local input
         const formatForInput = (dateStr: string | null) => {
           if (!dateStr) return "";
           const d = new Date(dateStr);
-          // Format to "YYYY-MM-DDTHH:mm"
           return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
             .toISOString()
             .slice(0, 16);
@@ -61,56 +67,48 @@ export default function EditActivityPage({
       setLoading(false);
     };
 
-    fetchActivityData();
-  }, [activityId]);
+    checkUserAndFetchData();
+  }, [activityId, router]);
 
-  // 2. Handle the form submission to UPDATE the data
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage("Updating activity...");
-
     const { error } = await supabase
       .from("activities")
       .update({
         title,
         description,
-        activity_date: activityDate || null,
-        end_date: endDate || null,
-        image_url: imageUrl || null,
-        registration_link: registrationLink || null,
+        activity_date: activityDate,
+        end_date: endDate,
+        image_url: imageUrl,
+        registration_link: registrationLink,
       })
-      .eq("id", activityId); // IMPORTANT: Update only where the id matches
+      .eq("id", activityId);
 
     if (error) {
       setMessage(`Error: ${error.message}`);
     } else {
       setMessage("Activity updated successfully!");
-      setTimeout(() => {
-        router.push("/admin/dashboard/activities");
-      }, 1500);
+      setTimeout(() => router.push("/admin/dashboard/activities"), 1500);
     }
   };
 
   if (loading) {
     return (
-      <AdminLayout>
-        <p>Loading activity data...</p>
+      <AdminLayout user={user}>
+        <p>Loading activity...</p>
       </AdminLayout>
     );
   }
 
   return (
-    <AdminLayout>
+    <AdminLayout user={user}>
       <div className={styles.header}>
         <h1 className={styles.title}>Edit Activity</h1>
       </div>
-
       <form onSubmit={handleSubmit} className={formStyles.form}>
-        {/* The form is identical to the 'new' form, but pre-filled with data */}
         <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
-          <label htmlFor="title" className={formStyles.label}>
-            Title
-          </label>
+          <label htmlFor="title">Title</label>
           <input
             type="text"
             id="title"
@@ -120,11 +118,9 @@ export default function EditActivityPage({
             className={formStyles.input}
           />
         </div>
-
+        {/* ... other form fields ... */}
         <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
-          <label htmlFor="description" className={formStyles.label}>
-            Description
-          </label>
+          <label htmlFor="description">Description</label>
           <textarea
             id="description"
             value={description}
@@ -132,11 +128,8 @@ export default function EditActivityPage({
             className={formStyles.textarea}
           ></textarea>
         </div>
-
         <div className={formStyles.formGroup}>
-          <label htmlFor="activityDate" className={formStyles.label}>
-            Activity Date
-          </label>
+          <label htmlFor="activityDate">Activity Date</label>
           <input
             type="datetime-local"
             id="activityDate"
@@ -145,11 +138,8 @@ export default function EditActivityPage({
             className={formStyles.input}
           />
         </div>
-
         <div className={formStyles.formGroup}>
-          <label htmlFor="endDate" className={formStyles.label}>
-            End Date (for display)
-          </label>
+          <label htmlFor="endDate">End Date</label>
           <input
             type="datetime-local"
             id="endDate"
@@ -158,11 +148,8 @@ export default function EditActivityPage({
             className={formStyles.input}
           />
         </div>
-
         <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
-          <label htmlFor="imageUrl" className={formStyles.label}>
-            Image URL
-          </label>
+          <label htmlFor="imageUrl">Image URL</label>
           <input
             type="url"
             id="imageUrl"
@@ -171,11 +158,8 @@ export default function EditActivityPage({
             className={formStyles.input}
           />
         </div>
-
         <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
-          <label htmlFor="registrationLink" className={formStyles.label}>
-            Registration Link (Google Form)
-          </label>
+          <label htmlFor="registrationLink">Registration Link</label>
           <input
             type="url"
             id="registrationLink"
@@ -184,16 +168,11 @@ export default function EditActivityPage({
             className={formStyles.input}
           />
         </div>
-
         <button type="submit" className={formStyles.submitButton}>
           Update Activity
         </button>
-
         {message && (
-          <p
-            className={formStyles.fullWidth}
-            style={{ textAlign: "center", marginTop: "1rem" }}
-          >
+          <p className={formStyles.fullWidth} style={{ textAlign: "center" }}>
             {message}
           </p>
         )}
