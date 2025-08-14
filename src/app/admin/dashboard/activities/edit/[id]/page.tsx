@@ -2,24 +2,22 @@
 
 import { useState, FormEvent, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { useRouter, useParams } from "next/navigation"; // <-- FIX #1: Import useParams
+import { useRouter, useParams } from "next/navigation"; // <-- Make sure useParams is imported
 import AdminLayout from "@/components/AdminLayout";
 import styles from "../../../dashboard.module.css";
 import formStyles from "@/app/volunteers/volunteers.module.css";
 import { User } from "@supabase/supabase-js";
 
-// The function now takes NO props
+// The component takes NO props from the server
 export default function EditActivityPage() {
   const router = useRouter();
-  const params = useParams(); // <-- FIX #2: Get params using the hook
-  const activityId = params.id as string; // Get the id from the hook's result
+  const params = useParams(); // <-- Use the hook to get URL params
+  const activityId = params.id as string; // <-- Get the ID safely
 
-  // All the rest of your code is PERFECT and does not need to change.
+  // State for the page and form
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-
-  // Form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [activityDate, setActivityDate] = useState("");
@@ -28,6 +26,7 @@ export default function EditActivityPage() {
   const [registrationLink, setRegistrationLink] = useState("");
 
   useEffect(() => {
+    // This effect runs only in the browser
     const checkUserAndFetchData = async () => {
       const {
         data: { session },
@@ -38,28 +37,30 @@ export default function EditActivityPage() {
       }
       setUser(session.user);
 
-      const { data, error } = await supabase
-        .from("activities")
-        .select("*")
-        .eq("id", activityId)
-        .single();
+      if (activityId) {
+        const { data, error } = await supabase
+          .from("activities")
+          .select("*")
+          .eq("id", activityId)
+          .single();
 
-      if (error) {
-        setMessage(`Error fetching data: ${error.message}`);
-      } else if (data) {
-        setTitle(data.title || "");
-        setDescription(data.description || "");
-        setImageUrl(data.image_url || "");
-        setRegistrationLink(data.registration_link || "");
-        const formatForInput = (dateStr: string | null) => {
-          if (!dateStr) return "";
-          const d = new Date(dateStr);
-          return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-            .toISOString()
-            .slice(0, 16);
-        };
-        setActivityDate(formatForInput(data.activity_date));
-        setEndDate(formatForInput(data.end_date));
+        if (error) {
+          setMessage(`Error: ${error.message}`);
+        } else if (data) {
+          setTitle(data.title || "");
+          setDescription(data.description || "");
+          setImageUrl(data.image_url || "");
+          setRegistrationLink(data.registration_link || "");
+          const formatForInput = (dateStr: string | null) => {
+            if (!dateStr) return "";
+            const d = new Date(dateStr);
+            return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+              .toISOString()
+              .slice(0, 16);
+          };
+          setActivityDate(formatForInput(data.activity_date));
+          setEndDate(formatForInput(data.end_date));
+        }
       }
       setLoading(false);
     };
@@ -98,13 +99,13 @@ export default function EditActivityPage() {
     );
   }
 
-  // The rest of the JSX is exactly the same
   return (
     <AdminLayout user={user}>
       <div className={styles.header}>
         <h1 className={styles.title}>Edit Activity</h1>
       </div>
       <form onSubmit={handleSubmit} className={formStyles.form}>
+        {/* Your form JSX goes here, it does not need to change */}
         <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
           <label htmlFor="title">Title</label>
           <input
