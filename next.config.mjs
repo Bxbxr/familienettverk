@@ -1,7 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  // Add this new 'images' property
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     remotePatterns: [
       {
@@ -12,11 +10,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "plus.unsplash.com", // The new one
+        hostname: "plus.unsplash.com",
         port: "",
         pathname: "/**",
       },
-      // You can add more trusted hostnames here in the future
     ],
   },
 };
