@@ -1,50 +1,14 @@
-/* --- Default State: Solid White Navbar --- */
+/* --- Base Navbar & Container --- */
 .navbar {
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: transparent;
   width: 100%;
   padding: 1rem 0;
-  position: fixed; /* Changed from sticky */
+  position: fixed;
   top: 0;
+  left: 0;
   z-index: 1000;
   transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
-.container {
-  width: 100%;
-  max-width: 1200px; /* This sets the maximum width of your content */
-  margin-left: auto; /* These two lines are what center the container */
-  margin-right: auto;
-  padding-left: 1rem; /* Adds some space on the sides for smaller screens */
-  padding-right: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* --- New Class for the Transparent State --- */
-.transparentNav {
-  background-color: transparent;
-  box-shadow: none;
-}
-
-/* --- Styles for Text/Icons when Transparent --- */
-.transparentNav .logo,
-.transparentNav .navLinks a {
-  color: #ffffff;
-}
-.transparentNav .menuButton svg path {
-  stroke: #ffffff;
-}
-.transparentNav .activeLink {
-  color: #ffffff !important;
-}
-.transparentNav .activeLink::after {
-  background-color: #ffffff !important;
-}
-
-/* --- ALL YOUR OTHER WORKING STYLES --- */
-/* (Container, Logo, Links, Animations, Mobile Menu, etc.) */
-/* These remain the same as your working version. */
 
 .container {
   width: 100%;
@@ -56,11 +20,35 @@
   align-items: center;
 }
 
+/* --- Scrolled & Transparent States --- */
+.navbar.scrolled {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar.transparentNav {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* --- Logo --- */
 .logo {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #1e60a9;
+  color: #1e60a9; /* Default blue */
   text-decoration: none;
+}
+
+/* --- Desktop Links --- */
+.navLinks {
+  display: none; /* Hidden on mobile */
+}
+@media (min-width: 768px) {
+  .navLinks {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
 }
 
 .navLinks a {
@@ -94,14 +82,29 @@
   transform-origin: bottom left;
 }
 
-@media (min-width: 768px) {
-  .navLinks {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-  }
+.activeLink {
+  color: #1e60a9 !important;
+  font-weight: 600;
 }
 
+.activeLink::after {
+  transform: scaleX(1) !important;
+  transform-origin: bottom left !important;
+}
+
+/* --- Transparent State Overrides --- */
+.navbar.transparentNav .logo,
+.navbar.transparentNav .navLinks a {
+  color: #111827 !important; /* Force black text */
+}
+.navbar.transparentNav .menuButton svg path {
+  stroke: #111827 !important; /* Force black icon */
+}
+.navbar.transparentNav .activeLink::after {
+  background-color: #d9363e !important;
+}
+
+/* --- Mobile Menu --- */
 .menuButton {
   display: block;
   background: none;
@@ -124,9 +127,8 @@
   top: 100%;
   left: 0;
   width: 100%;
-  padding: 1rem 0;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transform: translateY(-100%);
+  transform: translateY(-150%);
   opacity: 0;
   visibility: hidden;
   transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s;
@@ -138,34 +140,25 @@
   visibility: visible;
 }
 
+/* --- THIS IS THE FIX FOR THE MOBILE MENU LINKS --- */
 .mobileMenu a {
   padding: 1rem;
   width: 100%;
   text-align: center;
   color: #374151;
   text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border-bottom: 1px solid #f3f4f6; /* Subtle separator line */
 }
 
-.activeLink {
-  color: #1e60a9 !important;
-  font-weight: 600;
+.mobileMenu a:last-child {
+  border-bottom: none; /* Remove border from the last item */
 }
 
-.activeLink::after {
-  transform: scaleX(1) !important;
-  transform-origin: bottom left !important;
+.mobileMenu a:hover {
+  background-color: #f9fafb; /* Add a hover state */
 }
-/* --- NEW RULE TO FORCE BLACK TEXT --- */
-
-/* When the navbar is transparent, override the text and icon colors to be black */
-.transparentNav .logo,
-.transparentNav .navLinks a,
-.transparentNav .menuButton svg path {
-  color: #111827 !important; /* A dark black color */
-  stroke: #111827 !important; /* This is for the hamburger icon lines */
-}
-
-/* Also, ensure the active link's underline is red */
-.transparentNav .activeLink::after {
-  background-color: #d9363e !important; /* Your brand-red */
+.navbarHidden {
+  top: -100px; /* Move the navbar completely off-screen upwards */
 }

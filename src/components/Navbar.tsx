@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./Navbar.module.css";
 
+// Hamburger Icon Component
 const HamburgerIcon = () => (
   <svg
     width="24"
@@ -26,12 +27,38 @@ const HamburgerIcon = () => (
 export default function Navbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false); // <-- ADDED: State for hiding
   const pathname = usePathname();
 
+  // UPDATED: This effect now handles both scroll states
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      const currentScrollY = window.scrollY;
+
+      // Handles the solid/transparent background state
+      setIsScrolled(currentScrollY > 10);
+
+      // Handles the hide/show on mobile state
+      if (window.innerWidth < 768) {
+        // Only run this on mobile
+        if (currentScrollY > lastScrollY && currentScrollY > 80) {
+          // Scrolling DOWN
+          setIsHidden(true);
+          setMobileMenuOpen(false); // Also close the menu automatically
+        } else {
+          // Scrolling UP
+          setIsHidden(false);
+        }
+      } else {
+        // On desktop, the navbar is never hidden
+        setIsHidden(false);
+      }
+
+      lastScrollY = currentScrollY;
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -40,6 +67,10 @@ export default function Navbar() {
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const navLinks = [
@@ -51,24 +82,22 @@ export default function Navbar() {
     { href: "/contact", label: "Contact Us" },
   ];
 
-  // --- THE NEW, SIMPLE LOGIC ---
-  // The navbar should be transparent if we are on the homepage AND not scrolled.
+  // Logic to determine all necessary CSS classes
   const isTransparent = pathname === "/" && !isScrolled;
+  const navClasses = [
+    styles.navbar,
+    isTransparent ? styles.transparentNav : styles.scrolled,
+    isHidden ? styles.navbarHidden : "",
+  ].join(" ");
 
-  // Find the return statement in your Navbar.tsx and replace it with this
   return (
-    <nav
-      className={`${styles.navbar} ${
-        isTransparent ? styles.transparentNav : ""
-      }`}
-    >
-      {/* This is the new centered container */}
+    <nav className={navClasses}>
       <div className={styles.container}>
         <Link href="/" onClick={closeMobileMenu} className={styles.logo}>
           Familienettverk
         </Link>
 
-        {/* Desktop Links are now inside the container */}
+        {/* Desktop Links */}
         <div className={styles.navLinks}>
           {navLinks.map((link) => (
             <Link
@@ -81,17 +110,17 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* The mobile button is also inside the container */}
+        {/* Mobile Menu Button */}
         <button
           className={styles.menuButton}
-          onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+          onClick={toggleMobileMenu}
           aria-label="Toggle menu"
         >
           <HamburgerIcon />
         </button>
       </div>
 
-      {/* The mobile dropdown menu stays outside the container */}
+      {/* Mobile Menu Dropdown */}
       <div
         className={`${styles.mobileMenu} ${
           isMobileMenuOpen ? styles.open : ""
