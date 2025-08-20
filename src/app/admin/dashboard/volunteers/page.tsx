@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import AdminLayout from "@/components/AdminLayout";
-import styles from "../dashboard.module.css"; // Reuse the same dashboard styles
+import styles from "../dashboard.module.css";
+import { User } from "@supabase/supabase-js";
 
 // Define the type for a volunteer
 type Volunteer = {
@@ -19,65 +20,64 @@ type Volunteer = {
 export default function ViewVolunteersPage() {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(""); // error is a string
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
-  // Check for authenticated user
   useEffect(() => {
-    const checkUser = async () => {
+    const checkUserAndFetchData = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) {
         router.push("/admin/login");
+        return;
       }
-    };
-    checkUser();
-  }, [router]);
+      setUser(session.user);
 
-  // Fetch volunteers data
-  useEffect(() => {
-    const fetchVolunteers = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
+      const { data, error: fetchError } = await supabase
         .from("volunteers")
-        .select("id, created_at, full_name, email, phone_number, skills") // Select specific columns
+        .select("id, created_at, full_name, email, phone_number, skills")
         .order("created_at", { ascending: false });
 
-      if (error) {
-        setError(error.message);
+      if (fetchError) {
+        setError(fetchError.message); // We store the error message string here
       } else if (data) {
         setVolunteers(data);
       }
       setLoading(false);
     };
 
-    fetchVolunteers();
-  }, []);
+    checkUserAndFetchData();
+  }, [router]);
 
-  if (loading)
+  if (loading) {
     return (
-      <AdminLayout>
+      <AdminLayout user={user}>
         <p>Loading volunteers...</p>
       </AdminLayout>
     );
-  // We need to create a read policy for this to work! We'll do that next.
+  }
+
   if (error) {
     return (
-      <AdminLayout>
+      <AdminLayout user={user}>
         <p>Error fetching volunteers.</p>
         <p>
           Please ensure you have created a SELECT policy for authenticated users
           on the &apos;volunteers&apos; table.
         </p>
         <p>
-          <strong>Error details:</strong> {error.message}
+          {/* --- THE FIX IS HERE --- */}
+          {/* Render the 'error' string directly, not 'error.message' */}
+          <strong>Error details:</strong> {error}
         </p>
       </AdminLayout>
     );
   }
+
   return (
-    <AdminLayout>
+    <AdminLayout user={user}>
       <div className={styles.header}>
         <h1 className={styles.title}>Volunteer Submissions</h1>
       </div>
