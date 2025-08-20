@@ -4,10 +4,12 @@ import { useState, FormEvent, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import AdminLayout from "@/components/AdminLayout";
-import styles from "../../dashboard.module.css"; // Adjust path for shared CSS
-import formStyles from "@/app/volunteers/volunteers.module.css"; // Reuse volunteer form styles
+import styles from "../../dashboard.module.css";
+import formStyles from "@/app/volunteers/volunteers.module.css";
+import { User } from "@supabase/supabase-js"; // <-- Make sure this import is present
 
 export default function NewActivityPage() {
+  const [user, setUser] = useState<User | null>(null); // <-- Add user state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [activityDate, setActivityDate] = useState("");
@@ -17,7 +19,6 @@ export default function NewActivityPage() {
   const [message, setMessage] = useState("");
   const router = useRouter();
 
-  // Check for authenticated user
   useEffect(() => {
     const checkUser = async () => {
       const {
@@ -25,6 +26,8 @@ export default function NewActivityPage() {
       } = await supabase.auth.getSession();
       if (!session) {
         router.push("/admin/login");
+      } else {
+        setUser(session.user); // <-- Set the user state here
       }
     };
     checkUser();
@@ -49,7 +52,6 @@ export default function NewActivityPage() {
       setMessage(`Error: ${error.message}`);
     } else {
       setMessage("Activity created successfully!");
-      // Redirect back to the activities list after a short delay
       setTimeout(() => {
         router.push("/admin/dashboard/activities");
       }, 1500);
@@ -57,13 +59,14 @@ export default function NewActivityPage() {
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout user={user}>
+      {" "}
+      {/* <-- Pass the user prop here */}
       <div className={styles.header}>
         <h1 className={styles.title}>Add New Activity</h1>
       </div>
-
-      {/* We can reuse the volunteer form styles for a consistent look */}
       <form onSubmit={handleSubmit} className={formStyles.form}>
+        {/* The rest of your form JSX is perfect and does not need to change */}
         <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
           <label htmlFor="title" className={formStyles.label}>
             Title
@@ -77,7 +80,6 @@ export default function NewActivityPage() {
             className={formStyles.input}
           />
         </div>
-
         <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
           <label htmlFor="description" className={formStyles.label}>
             Description
@@ -89,7 +91,6 @@ export default function NewActivityPage() {
             className={formStyles.textarea}
           ></textarea>
         </div>
-
         <div className={formStyles.formGroup}>
           <label htmlFor="activityDate" className={formStyles.label}>
             Activity Date
@@ -102,7 +103,6 @@ export default function NewActivityPage() {
             className={formStyles.input}
           />
         </div>
-
         <div className={formStyles.formGroup}>
           <label htmlFor="endDate" className={formStyles.label}>
             End Date (for display)
@@ -115,7 +115,6 @@ export default function NewActivityPage() {
             className={formStyles.input}
           />
         </div>
-
         <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
           <label htmlFor="imageUrl" className={formStyles.label}>
             Image URL
@@ -129,7 +128,6 @@ export default function NewActivityPage() {
             placeholder="https://images.unsplash.com/..."
           />
         </div>
-
         <div className={`${formStyles.formGroup} ${formStyles.fullWidth}`}>
           <label htmlFor="registrationLink" className={formStyles.label}>
             Registration Link (Google Form)
@@ -143,11 +141,9 @@ export default function NewActivityPage() {
             placeholder="https://forms.google.com/..."
           />
         </div>
-
         <button type="submit" className={formStyles.submitButton}>
           Create Activity
         </button>
-
         {message && (
           <p
             className={formStyles.fullWidth}
